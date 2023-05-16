@@ -36,8 +36,8 @@ resource "aws_secretsmanager_secret" "this" {
 }
 
 resource "aws_secretsmanager_secret_version" "this" {
-  secret_id      = aws_secretsmanager_secret.this.id
-  secret_string  = jsonencode(var.rotation_strategy == "single" ? local.secret_value_single_user : local.secret_value_multiuser)
+  secret_id     = aws_secretsmanager_secret.this.id
+  secret_string = jsonencode(var.rotation_strategy == "single" ? local.secret_value_single_user : local.secret_value_multiuser)
 
   lifecycle {
     ignore_changes = [
@@ -66,10 +66,10 @@ module "lambda_security_group" {
   source  = "terraform-aws-modules/security-group/aws"
   version = "4.3.0"
 
-  name          = local.name
-  description   = "Contains egress rules for secret rotation lambda"
-  vpc_id        = var.rotation_lambda_vpc_id
-  egress_rules  = ["https-443-tcp"]
+  name         = local.name
+  description  = "Contains egress rules for secret rotation lambda"
+  vpc_id       = var.rotation_lambda_vpc_id
+  egress_rules = ["https-443-tcp"]
 
   egress_with_source_security_group_id = [
     {
@@ -78,7 +78,7 @@ module "lambda_security_group" {
     },
   ]
 
-  tags = merge(var.tags, {Name = local.name})
+  tags = merge(var.tags, { Name = local.name })
 }
 
 module "db_ingress" {
@@ -119,7 +119,7 @@ module "rotation_lambda" {
 
   allowed_triggers = {
     SecretsManager = {
-      service    = "secretsmanager"
+      service = "secretsmanager"
     }
   }
 
