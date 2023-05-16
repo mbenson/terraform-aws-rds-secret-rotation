@@ -119,3 +119,9 @@ variable "role_permissions_boundary" {
   type        = string
   default     = null
 }
+
+variable "kms_key_id" {
+  description = "Optional key ID for generated secret."
+  type        = string
+  default     = null
+}

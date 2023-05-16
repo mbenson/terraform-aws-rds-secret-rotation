@@ -33,6 +33,7 @@ data "aws_region" "current" {}
 resource "aws_secretsmanager_secret" "this" {
   name                    = "${var.name_prefix}-${var.username}"
   recovery_window_in_days = var.secret_recovery_window_days
+  kms_key_id              = var.kms_key_id
 }
 
 resource "aws_secretsmanager_secret_version" "this" {
@@ -146,6 +147,11 @@ locals {
   ])
 }
 
+data "aws_kms_key" "for_secret" {
+  count  = var.kms_key_id == null ? 0 : 1
+  key_id = var.kms_key_id
+}
+
 data "aws_iam_policy_document" "secret" {
   statement {
     actions = [
@@ -165,6 +171,19 @@ data "aws_iam_policy_document" "secret" {
     resources = [
       "*"
     ]
+  }
+  dynamic "statement" {
+    for_each = data.aws_kms_key.for_secret
+    iterator = key
+    content {
+      actions = [
+        "kms:Decrypt",
+        "kms:Encrypt",
+      ]
+      resources = [
+        key.arn
+      ]
+    }
   }
 }
 
